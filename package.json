@@ -15,5 +15,8 @@
   "scripts": {
     "release": "release-it",
     "build": "tsc"
+  },
+  "dependencies": {
+    "pluralize": "^8.0.0"
   }
 }
