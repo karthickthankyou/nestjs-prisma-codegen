@@ -37,6 +37,7 @@ export const createComponentNames = (name: string) => {
 
 export const createCommonDtosFile = () => {
   const commonDtoFolder = 'src/common/dtos'
+
   // Check if the folder exists
   if (!fs.existsSync(commonDtoFolder)) {
     fs.mkdirSync(commonDtoFolder, { recursive: true })
@@ -48,7 +49,7 @@ export const createCommonDtosFile = () => {
 
   // Check if the common DTO file already exists
   if (!fs.existsSync(commonDto)) {
-    fs.writeFileSync(commonDtoPath, commonDtosFile())
+    fs.writeFileSync(commonDto, commonDtosFile())
 
     console.log('Common DTO file has been copied.')
   } else {
