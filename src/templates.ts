@@ -202,9 +202,7 @@ import { Prisma } from '@prisma/client'
 import { RestrictProperties } from 'src/common/dtos/common.input'
 
 @InputType()
-export class ${capital}WhereUniqueInput
-  implements RestrictProperties<${capital}WhereUniqueInput, Prisma.${capital}WhereUniqueInput>
-{
+export class ${capital}WhereUniqueInput {
   @Field(() => Number, { nullable: true })
   id: number
 }
