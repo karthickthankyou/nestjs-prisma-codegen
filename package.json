@@ -8,15 +8,23 @@
   },
   "devDependencies": {
     "@types/node": "^20.4.10",
+    "husky": "^8.0.0",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.1",
     "release-it": "^16.1.5",
     "typescript": "^5.1.6"
   },
   "scripts": {
+    "prettier": "prettier \"src/**/*.{ts,tsx,js,json}\" --ignore-path .gitignore",
+    "format:check": "yarn prettier --check",
+    "format:write": "yarn prettier --write",
     "release": "release-it",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "husky install",
+    "lint-staged": "lint-staged"
   },
   "dependencies": {
-    "pluralize": "^8.0.0",
-    "change-case": "^4.1.2"
+    "change-case": "^4.1.2",
+    "pluralize": "^8.0.0"
   }
 }
