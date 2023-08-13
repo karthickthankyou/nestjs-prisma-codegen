@@ -4,6 +4,8 @@ import * as changeCase from 'change-case'
 import path = require('path')
 import * as fs from 'fs'
 
+import { commonDtosFile } from './templates'
+
 export const capitalize = (word: string) =>
   word.charAt(0).toUpperCase() + word.slice(1)
 
@@ -38,15 +40,11 @@ export const createCommonDtosFile = () => {
     process.cwd(),
     'src/models/common/dtos/common.input.ts',
   )
-  const commonDtoTemplatePath = path.join(
-    __dirname,
-    './templates/common.input.ts',
-  )
 
   // Check if the common DTO file already exists
   if (!fs.existsSync(commonDtoPath)) {
     // Read the common DTO template
-    const commonDtoContent = fs.readFileSync(commonDtoTemplatePath, 'utf8')
+    const commonDtoContent = fs.readFileSync(commonDtosFile(), 'utf8')
 
     // Ensure the directory exists
     fs.mkdirSync(path.dirname(commonDtoPath), { recursive: true })
