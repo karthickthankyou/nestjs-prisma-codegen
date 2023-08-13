@@ -36,9 +36,14 @@ export const createComponentNames = (name: string) => {
 }
 
 export const createCommonDtosFile = () => {
+  const modelsFolder = 'src/models'
   const commonDtoFolder = 'src/common/dtos'
 
-  // Check if the folder exists
+  if (!fs.existsSync(modelsFolder)) {
+    fs.mkdirSync(modelsFolder, { recursive: true })
+    console.log(`Folder ${modelsFolder} has been created.`)
+  }
+
   if (!fs.existsSync(commonDtoFolder)) {
     fs.mkdirSync(commonDtoFolder, { recursive: true })
     console.log(`Folder ${commonDtoFolder} has been created.`)
