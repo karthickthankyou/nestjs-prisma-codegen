@@ -36,21 +36,19 @@ export const createComponentNames = (name: string) => {
 }
 
 export const createCommonDtosFile = () => {
-  const commonDtoPath = path.join(
-    process.cwd(),
-    'src/models/common/dtos/common.input.ts',
-  )
+  const commonDtoFolder = 'src/models/common/dtos'
+  // Check if the folder exists
+  if (!fs.existsSync(commonDtoFolder)) {
+    fs.mkdirSync(commonDtoFolder, { recursive: true })
+    console.log(`Folder ${commonDtoFolder} has been created.`)
+  }
+
+  const commonDtoPath = commonDtoFolder + '/common.input.ts'
+  const commonDto = path.join(process.cwd(), commonDtoPath)
 
   // Check if the common DTO file already exists
-  if (!fs.existsSync(commonDtoPath)) {
-    // Read the common DTO template
-    const commonDtoContent = fs.readFileSync(commonDtosFile(), 'utf8')
-
-    // Ensure the directory exists
-    fs.mkdirSync(path.dirname(commonDtoPath), { recursive: true })
-
-    // Write the common DTO file to the target directory
-    fs.writeFileSync(commonDtoPath, commonDtoContent)
+  if (!fs.existsSync(commonDto)) {
+    fs.writeFileSync(commonDtoPath, commonDtosFile())
 
     console.log('Common DTO file has been copied.')
   } else {
