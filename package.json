@@ -1,0 +1,10 @@
+{
+  "name": "nestjs-prisma-codegen",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.4.10",
+    "change-case": "^4.1.2"
+  }
+}
