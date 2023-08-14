@@ -138,7 +138,7 @@ export const findInputDtoFile = (names: Names) => {
 
   return `import { ArgsType, Field, registerEnumType } from '@nestjs/graphql'
 import { Prisma } from '@prisma/client'
-import { ${capital}OrderByWithRelationInput } from './orderBy.args'
+import { ${capital}OrderByWithRelationInput } from './order-by.args'
 import { ${capital}WhereInput, ${capital}WhereUniqueInput } from './where.args'
 import { RestrictProperties } from 'src/common/dtos/common.input'
 

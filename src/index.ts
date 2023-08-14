@@ -62,7 +62,10 @@ fs.writeFileSync(
   updateInputDtoFile(names),
 )
 fs.writeFileSync(`${targetDir}/dto/find.args.ts`, findInputDtoFile(names))
-fs.writeFileSync(`${targetDir}/dto/orderBy.args.ts`, orderByInputDtoFile(names))
+fs.writeFileSync(
+  `${targetDir}/dto/order-by.args.ts`,
+  orderByInputDtoFile(names),
+)
 fs.writeFileSync(`${targetDir}/dto/where.args.ts`, whereInputDtoFile(names))
 fs.writeFileSync(
   `${targetDir}/entities/${kebab}.entity.ts`,
