@@ -24,10 +24,10 @@ export const createResolverFile = (names: Names) => {
     names
   const fileContent = `import { Resolver, Query, Mutation, Args } from '@nestjs/graphql'
 import { ${capitalPlural}Service } from './${kebabPlural}.service'
-import { ${capital} } from './entities/${kebab}.entity'
-import { FindMany${capital}Args, FindUnique${capital}Args } from './dto/find.args'
-import { Create${capital}Input } from './dto/create-${kebab}.input'
-import { Update${capital}Input } from './dto/update-${kebab}.input'
+import { ${capital} } from './entity/${kebab}.entity'
+import { FindMany${capital}Args, FindUnique${capital}Args } from './dtos/find.args'
+import { Create${capital}Input } from './dtos/create-${kebab}.input'
+import { Update${capital}Input } from './dtos/update-${kebab}.input'
 
 @Resolver(() => ${capital})
 export class ${capitalPlural}Resolver {
@@ -66,10 +66,10 @@ export class ${capitalPlural}Resolver {
 export const createServiceFile = (names: Names) => {
   const { capitalPlural, capital, kebab, camel } = names
   const fileContent = `import { Injectable } from '@nestjs/common'
-import { FindMany${capital}Args, FindUnique${capital}Args } from './dto/find.args'
+import { FindMany${capital}Args, FindUnique${capital}Args } from './dtos/find.args'
 import { PrismaService } from 'src/common/prisma/prisma.service'
-import { Create${capital}Input } from './dto/create-${kebab}.input'
-import { Update${capital}Input } from './dto/update-${kebab}.input'
+import { Create${capital}Input } from './dtos/create-${kebab}.input'
+import { Update${capital}Input } from './dtos/update-${kebab}.input'
 
 @Injectable()
 export class ${capitalPlural}Service {
@@ -104,11 +104,11 @@ export class ${capitalPlural}Service {
   return fileContent
 }
 
-// *dto/create-${lower}.input.ts
+// *dtos/create-${lower}.input.ts
 export const createInputDtoFile = (names: Names) => {
   const { kebab, capital } = names
   const fileContent = `import { InputType, PickType } from '@nestjs/graphql'
-import { ${capital} } from '../entities/${kebab}.entity'
+import { ${capital} } from '../entity/${kebab}.entity'
 
 @InputType()
 export class Create${capital}Input extends PickType(${capital},[],InputType) {}

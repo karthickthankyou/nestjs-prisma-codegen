@@ -38,8 +38,8 @@ const { kebabPlural, kebab } = names
 const targetDir = join(process.cwd(), 'src/models', kebabPlural)
 
 fs.mkdirSync(`${process.cwd()}/src/models/${kebabPlural}`)
-fs.mkdirSync(`${process.cwd()}/src/models/${kebabPlural}/dto`)
-fs.mkdirSync(`${process.cwd()}/src/models/${kebabPlural}/entities`)
+fs.mkdirSync(`${process.cwd()}/src/models/${kebabPlural}/dtos`)
+fs.mkdirSync(`${process.cwd()}/src/models/${kebabPlural}/entity`)
 
 fs.writeFileSync(
   `${targetDir}/${kebabPlural}.module.ts`,
@@ -54,21 +54,21 @@ fs.writeFileSync(
   createServiceFile(names),
 )
 fs.writeFileSync(
-  `${targetDir}/dto/create-${kebab}.input.ts`,
+  `${targetDir}/dtos/create-${kebab}.input.ts`,
   createInputDtoFile(names),
 )
 fs.writeFileSync(
-  `${targetDir}/dto/update-${kebab}.input.ts`,
+  `${targetDir}/dtos/update-${kebab}.input.ts`,
   updateInputDtoFile(names),
 )
-fs.writeFileSync(`${targetDir}/dto/find.args.ts`, findInputDtoFile(names))
+fs.writeFileSync(`${targetDir}/dtos/find.args.ts`, findInputDtoFile(names))
 fs.writeFileSync(
-  `${targetDir}/dto/order-by.args.ts`,
+  `${targetDir}/dtos/order-by.args.ts`,
   orderByInputDtoFile(names),
 )
-fs.writeFileSync(`${targetDir}/dto/where.args.ts`, whereInputDtoFile(names))
+fs.writeFileSync(`${targetDir}/dtos/where.args.ts`, whereInputDtoFile(names))
 fs.writeFileSync(
-  `${targetDir}/entities/${kebab}.entity.ts`,
+  `${targetDir}/entity/${kebab}.entity.ts`,
   createEntityFile(names),
 )
 console.log(`
