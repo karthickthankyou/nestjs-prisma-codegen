@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import { createAuthRoutes } from './actions/authRoutes'
-import { createEntityFiles } from './actions/entity'
+import { createEntityFiles, createPrismaModule } from './actions/entity'
 import {
   createDecoratorFiles,
   createGuardFiles,
@@ -11,6 +11,7 @@ import {
 const [action] = process.argv.slice(2, 3)
 
 if (action === '--entity') {
+  createPrismaModule()
   createEntityFiles()
 } else if (action === '--guard') {
   createTypes()

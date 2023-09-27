@@ -64,6 +64,10 @@ export const createFolderIfNotPresent = (folderName: string) => {
 }
 
 export const fsWriteFile = (path: string, fileContent: string) => {
+  if (fs.existsSync(path)) {
+    return
+  }
+
   fs.writeFileSync(path, fileContent)
   console.log(`📃 File created at ${path}`)
 }

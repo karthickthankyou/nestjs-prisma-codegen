@@ -1,6 +1,11 @@
 import { join } from 'path'
 const fs = require('fs')
-import { createCommonDtosFile, createComponentNames } from '../util'
+import {
+  createCommonDtosFile,
+  createComponentNames,
+  createFolderIfNotPresent,
+  fsWriteFile,
+} from '../util'
 import {
   createEntityFile,
   createInputDtoFile,
@@ -12,6 +17,14 @@ import {
   updateInputDtoFile,
   whereInputDtoFile,
 } from '../templates/entity'
+import { prismaModule, prismaService } from '../templates/prisma'
+
+export const createPrismaModule = () => {
+  const prismaPath = `src/common/prisma`
+  createFolderIfNotPresent(prismaPath)
+  fsWriteFile(`${prismaPath}/prisma.module.ts`, prismaModule)
+  fsWriteFile(`${prismaPath}/prisma.service.ts`, prismaService)
+}
 
 export const createEntityFiles = () => {
   const [componentName] = process.argv.slice(3, 4)
