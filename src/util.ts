@@ -4,7 +4,7 @@ import * as changeCase from 'change-case'
 import path = require('path')
 import * as fs from 'fs'
 
-import { commonDtosFile } from './templates'
+import { commonDtosFile } from './templates/entity'
 
 export const capitalize = (word: string) =>
   word.charAt(0).toUpperCase() + word.slice(1)
@@ -39,15 +39,8 @@ export const createCommonDtosFile = () => {
   const modelsFolder = 'src/models'
   const commonDtoFolder = 'src/common/dtos'
 
-  if (!fs.existsSync(modelsFolder)) {
-    fs.mkdirSync(modelsFolder, { recursive: true })
-    console.log(`Folder ${modelsFolder} has been created.`)
-  }
-
-  if (!fs.existsSync(commonDtoFolder)) {
-    fs.mkdirSync(commonDtoFolder, { recursive: true })
-    console.log(`Folder ${commonDtoFolder} has been created.`)
-  }
+  createFolderIfNotPresent(modelsFolder)
+  createFolderIfNotPresent(commonDtoFolder)
 
   const commonDtoPath = commonDtoFolder + '/common.input.ts'
   const commonDto = path.join(process.cwd(), commonDtoPath)
@@ -60,4 +53,17 @@ export const createCommonDtosFile = () => {
   } else {
     console.log('Common DTO file already exists.')
   }
+}
+
+export const createFolderIfNotPresent = (folderName: string) => {
+  if (!fs.existsSync(folderName)) {
+    fs.mkdirSync(folderName, { recursive: true })
+    console.log(`
+📂 Folder ${folderName} has been created.`)
+  }
+}
+
+export const fsWriteFile = (path: string, fileContent: string) => {
+  fs.writeFileSync(path, fileContent)
+  console.log(`📃 File created at ${path}`)
 }

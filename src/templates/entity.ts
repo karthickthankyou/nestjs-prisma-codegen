@@ -1,6 +1,6 @@
 #!/usr/bin/env ts-node
 
-import { Names } from './util'
+import { Names } from '../util'
 
 // *module.ts
 export const createModuleFile = (names: Names) => {
