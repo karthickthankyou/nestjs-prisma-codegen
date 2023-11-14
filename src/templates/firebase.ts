@@ -1,5 +1,4 @@
-export const firebaseService = `import { GetUserType, Role } from '../../common/types'
-import { Injectable } from '@nestjs/common'
+export const firebaseService = `import { Injectable } from '@nestjs/common'
 import * as admin from 'firebase-admin'
 import { PrismaService } from '../prisma/prisma.service'
 
@@ -9,8 +8,8 @@ export class FirebaseService {
 
   constructor(private readonly prisma: PrismaService) {
     const firebasePrivateKey = process.env.firebasePrivateKey.replace(
-      /\\n/g,
-      '\n',
+      /\\\\n/g,
+      '\\n',
     )
 
     this.firebaseApp = admin.initializeApp({

@@ -119,7 +119,6 @@ import {
   RegisterOutput,
 } from './dto/auth.input'
 import axios from 'axios'
-import * as admin from 'firebase-admin'
 import { GetUserType, Role } from 'src/common/types'
 
 @Injectable()
@@ -131,7 +130,7 @@ export class AuthService {
     console.log('axios.post: ', axios.post)
     try {
       const firebaseUser = await axios.post<LoginOutput>(
-        \`https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${process.env.firebaseAPIKey}\`,
+        \`https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=\${process.env.firebaseAPIKey}\`,
         { email, password, returnSecureToken: true },
       )
 
@@ -145,7 +144,7 @@ export class AuthService {
     const { refresh_token } = args
     try {
       const firebaseUser = await axios.post<RefreshTokenOutput>(
-        \`https://securetoken.googleapis.com/v1/token?key=${process.env.firebaseAPIKey}\`,
+        \`https://securetoken.googleapis.com/v1/token?key=\${process.env.firebaseAPIKey}\`,
         { grant_type: 'refresh_token', refresh_token, returnSecureToken: true },
       )
       console.log('Refresh token Data ', firebaseUser)
@@ -160,7 +159,7 @@ export class AuthService {
 
     try {
       const firebaseUser = await axios.post<RegisterOutput>(
-        \`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${process.env.firebaseAPIKey}\`,
+        \`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=\${process.env.firebaseAPIKey}\`,
         { email, password, displayName, returnSecureToken: true },
       )
 

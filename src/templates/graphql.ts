@@ -136,7 +136,7 @@ export class Update${capital}Input extends PartialType(Create${capital}Input) {
 export const findInputDtoFile = (names: Names) => {
   const { capital } = names
 
-  return `import { ArgsType, Field, registerEnumType } from '@nestjs/graphql'
+  return `import { ArgsType, Field, registerEnumType, PartialType } from '@nestjs/graphql'
 import { Prisma } from '@prisma/client'
 import { ${capital}OrderByWithRelationInput } from './order-by.args'
 import { ${capital}WhereInput, ${capital}WhereUniqueInput } from './where.args'
@@ -147,26 +147,25 @@ registerEnumType(Prisma.${capital}ScalarFieldEnum, {
 })
 
 @ArgsType()
-export class FindMany${capital}Args
-  implements RestrictProperties<FindMany${capital}Args, Omit<Prisma.${capital}FindManyArgs, 'include' | 'select'>>
+class FindMany${capital}ArgsStrict
+  implements RestrictProperties<FindMany${capital}ArgsStrict, Omit<Prisma.${capital}FindManyArgs, 'include' | 'select'>>
 {
-  @Field(() => ${capital}WhereInput, { nullable: true })
   where: ${capital}WhereInput
-  @Field(() => [${capital}OrderByWithRelationInput], { nullable: true })
   orderBy: ${capital}OrderByWithRelationInput[]
-  @Field(() => ${capital}WhereUniqueInput, { nullable: true })
   cursor: ${capital}WhereUniqueInput
-  @Field(() => Number, { nullable: true })
   take: number
-  @Field(() => Number, { nullable: true })
   skip: number
-  @Field(() => [Prisma.${capital}ScalarFieldEnum], { nullable: true })
+  @Field(() => [Prisma.${capital}ScalarFieldEnum])
   distinct: Prisma.${capital}ScalarFieldEnum[]
 }
 
 @ArgsType()
+export class FindMany${capital}Args extends PartialType(
+  FindMany${capital}ArgsStrict,
+) {}
+
+@ArgsType()
 export class FindUnique${capital}Args {
-  @Field({ nullable: true })
   where: ${capital}WhereUniqueInput
 }`
 }
@@ -174,68 +173,69 @@ export class FindUnique${capital}Args {
 export const orderByInputDtoFile = (names: Names) => {
   const { capital } = names
 
-  return `import { Field, InputType } from '@nestjs/graphql'
+  return `import { Field, InputType, PartialType } from '@nestjs/graphql'
 import { Prisma } from '@prisma/client'
 import { RestrictProperties } from 'src/common/dtos/common.input'
 
 @InputType()
-export class ${capital}OrderByWithRelationInput
-  implements RestrictProperties<${capital}OrderByWithRelationInput, Prisma.${capital}OrderByWithRelationInput>
+export class ${capital}OrderByWithRelationInputStrict
+  implements RestrictProperties<${capital}OrderByWithRelationInputStrict, Prisma.${capital}OrderByWithRelationInput>
 {
-  // Todo: Add properties
-  // @Field(() => Prisma.SortOrder, { nullable: true })
-  // id: Prisma.SortOrder
+  // Todo: Add below field decorator to the SortOrder properties.
+  // @Field(() => Prisma.SortOrder)
 }
+
+
+@InputType()
+export class ${capital}OrderByWithRelationInput extends PartialType(
+  ${capital}OrderByWithRelationInputStrict,
+) {}
 
 @InputType()
 export class ${capital}OrderByRelationAggregateInput {
-  @Field(() => Prisma.SortOrder, { nullable: true })
-  _count: Prisma.SortOrder
+  @Field(() => Prisma.SortOrder)
+  _count?: Prisma.SortOrder
 }
 `
 }
 export const whereInputDtoFile = (names: Names) => {
   const { capital } = names
 
-  return `import { Field, InputType } from '@nestjs/graphql'
+  return `import { Field, InputType, PartialType } from '@nestjs/graphql'
 import { Prisma } from '@prisma/client'
 import { RestrictProperties } from 'src/common/dtos/common.input'
 
 @InputType()
 export class ${capital}WhereUniqueInput {
-  @Field(() => Number, { nullable: true })
   id: number
 }
 
 @InputType()
-export class ${capital}WhereInput implements RestrictProperties<${capital}WhereInput, Prisma.${capital}WhereInput> {
-  // @Field(() => StringFilter, { nullable: true })
-  // uid: StringFilter
+export class ${capital}WhereInputStrict implements RestrictProperties<${capital}WhereInputStrict, Prisma.${capital}WhereInput> {
+  // Todo: Add the below field decorator only to the $Enums types.
+  // @Field(() => $Enums.x)
 
-  @Field(() => [${capital}WhereInput], { nullable: true })
   AND: ${capital}WhereInput[]
-  @Field(() => [${capital}WhereInput], { nullable: true })
   OR: ${capital}WhereInput[]
-  @Field(() => [${capital}WhereInput], { nullable: true })
   NOT: ${capital}WhereInput[]
 }
 
 @InputType()
+export class ${capital}WhereInput extends PartialType(
+  ${capital}WhereInputStrict,
+) {}
+
+@InputType()
 export class ${capital}ListRelationFilter {
-  @Field(() => ${capital}WhereInput, { nullable: true })
-  every: ${capital}WhereInput
-  @Field(() => ${capital}WhereInput, { nullable: true })
-  some: ${capital}WhereInput
-  @Field(() => ${capital}WhereInput, { nullable: true })
-  none: ${capital}WhereInput
+  every?: ${capital}WhereInput
+  some?: ${capital}WhereInput
+  none?: ${capital}WhereInput
 }
 
 @InputType()
 export class ${capital}RelationFilter {
-  @Field(() => ${capital}WhereInput, { nullable: true })
-  is: ${capital}WhereInput
-  @Field(() => ${capital}WhereInput, { nullable: true })
-  isNot: ${capital}WhereInput
+  is?: ${capital}WhereInput
+  isNot?: ${capital}WhereInput
 }
 `
 }
@@ -249,8 +249,8 @@ import { RestrictProperties } from 'src/common/dtos/common.input'
 
 @ObjectType()
 export class ${capital} implements RestrictProperties<${capital},${capital}Type> {
-    // Todo fill all properties. To make it nullable add below.
-    // @Field(() => String, { nullable: true })
+    // Todo Add below to make optional fields optional.
+    // @Field({ nullable: true })
 }
 `
 }
@@ -272,20 +272,13 @@ export type RestrictProperties<T, U> = {
 // implements Prisma.DateTimeFilter
 @InputType()
 export class DateTimeFilter {
-  @Field(() => String, { nullable: true })
-  equals?: string | Date;
-  @Field(() => [String], { nullable: true })
-  in?: string[] | Date[]
-  @Field(() => [String], { nullable: true })
-  notIn?: string[] | Date[]
-  @Field(() => String, { nullable: true })
-  lt?: string | Date
-  @Field(() => String, { nullable: true })
-  lte?: string | Date
-  @Field(() => String, { nullable: true })
-  gt?: string | Date
-  @Field(() => String, { nullable: true })
-  gte?: string | Date
+  equals?: string
+  in?: string[]
+  notIn?: string[]
+  lt?: string
+  lte?: string
+  gt?: string
+  gte?: string
 }
 
 registerEnumType(Prisma.QueryMode, {
@@ -295,142 +288,62 @@ registerEnumType(Prisma.QueryMode, {
 // implements Required<Prisma.StringFilter>
 @InputType()
 export class StringFilter {
-  @Field(() => String, { nullable: true })
   equals?: string;
-  @Field(() => [String], { nullable: true })
   in?: string[]
-  @Field(() => [String], { nullable: true })
   notIn?: string[]
-  @Field(() => String, { nullable: true })
   lt?: string
-  @Field(() => String, { nullable: true })
   lte?: string
-  @Field(() => String, { nullable: true })
   gt?: string
-  @Field(() => String, { nullable: true })
   gte?: string
-  @Field(() => String, { nullable: true })
   contains?: string
-  @Field(() => String, { nullable: true })
   startsWith?: string
-  @Field(() => String, { nullable: true })
   endsWith?: string
-  @Field(() => String, { nullable: true })
   not?: string
-  @Field(() => Prisma.QueryMode, { nullable: true })
+  @Field(() => Prisma.QueryMode)
   mode?: Prisma.QueryMode
 }
 @InputType()
 export class StringListFilter {
-  @Field(() => [String], { nullable: true })
-  equals: string[]
-  @Field(() => String, { nullable: true })
-  has: string
-  @Field(() => [String], { nullable: true })
-  hasEvery: string[]
-  @Field(() => [String], { nullable: true })
-  hasSome: string[]
-  @Field(() => Boolean, { nullable: true })
-  isEmpty: boolean
+  equals?: string[]
+  has?: string
+  hasEvery?: string[]
+  hasSome?: string[]
+  isEmpty?: boolean
 }
 
 @InputType()
 export class BoolFilter {
-  @Field(() => Boolean, { nullable: true })
   equals?: boolean
-  @Field(() => Boolean, { nullable: true })
   not?: boolean
 }
 
 // implements Required<Prisma.IntFilter>
 @InputType()
 export class IntFilter {
-  @Field(() => Number, { nullable: true })
   equals?: number
-  @Field(() => Number, { nullable: true })
   lt?: number
-  @Field(() => Number, { nullable: true })
   lte?: number
-  @Field(() => Number, { nullable: true })
   gt?: number
-  @Field(() => Number, { nullable: true })
   gte?: number
-  //   @Field(() => Number, { nullable: true })
-  //   in?: number
-  //   @Field(() => Number, { nullable: true })
-  //   notIn?: number
-  //   @Field(() => [Number], { nullable: true })
-  //   not?: number[]
 }
-// implements Required<Prisma.IntFilter>
-// @InputType()
-// export class FloatFilter {
-//   @Field(() => Float, { nullable: true })
-//   equals?: number;
-//   @Field(() => Float, { nullable: true })
-//   in?: number
-//   @Field(() => Float, { nullable: true })
-//   notIn?: number
-//   @Field(() => Float, { nullable: true })
-//   lt?: number
-//   @Field(() => Float, { nullable: true })
-//   lte?: number
-//   @Field(() => Float, { nullable: true })
-//   gt?: number
-//   @Field(() => Float, { nullable: true })
-//   gte?: number
-//   @Field(() => Float, { nullable: true })
-//   not?: number
-// }
+
 
 @InputType()
 export class FloatFilter {
-  @Field(() => Float, { nullable: true })
   equals?: number
-
-  @Field(() => Float, { nullable: true })
   lt?: number
-
-  @Field(() => Float, { nullable: true })
   lte?: number
-
-  @Field(() => Float, { nullable: true })
   gt?: number
-
-  @Field(() => Float, { nullable: true })
   gte?: number
-
-  @Field(() => Float, { nullable: true })
   not?: number
 }
 
-@InputType()
-export class WhereUniqueInputNumber {
-  @Field(() => Number, { nullable: true })
-  id: number
-}
-@InputType()
-export class WhereUniqueInputString {
-  @Field(() => String, { nullable: true })
-  id?: string
-}
-@InputType()
-export class WhereUniqueInputUid {
-  @Field(() => String, { nullable: true })
-  uid: string
-}
-
-export enum SortOrder {
-  asc = 'asc',
-  desc = 'desc',
-}
 registerEnumType(Prisma.SortOrder, {
   name: 'SortOrder',
 })
 
 @ObjectType()
 export class AggregateCountOutput {
-  @Field(() => Number)
   count: number
 }
 
@@ -451,9 +364,7 @@ export class LocationFilterInput {
 
 @ArgsType()
 export class PaginationInput {
-  @Field(() => Number, { nullable: true })
-  take: number
-  @Field(() => Number, { nullable: true })
-  skip: number
+  take?: number
+  skip?: number
 }
 `

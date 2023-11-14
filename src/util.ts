@@ -4,7 +4,7 @@ import * as changeCase from 'change-case'
 import path = require('path')
 import * as fs from 'fs'
 
-import { commonDtosFile } from './templates/entity'
+import { commonDtosFile } from './templates/graphql'
 
 export const capitalize = (word: string) =>
   word.charAt(0).toUpperCase() + word.slice(1)
