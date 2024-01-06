@@ -5,6 +5,7 @@ import path = require('path')
 import * as fs from 'fs'
 
 import { commonDtosFile } from './templates/graphql'
+import { commonDtosFileRest } from './templates/rest'
 
 export const capitalize = (word: string) =>
   word.charAt(0).toUpperCase() + word.slice(1)
@@ -36,10 +37,7 @@ export const createComponentNames = (name: string) => {
 }
 
 export const createCommonDtosFile = () => {
-  const modelsFolder = 'src/models'
   const commonDtoFolder = 'src/common/dtos'
-
-  createFolderIfNotPresent(modelsFolder)
   createFolderIfNotPresent(commonDtoFolder)
 
   const commonDtoPath = commonDtoFolder + '/common.input.ts'
@@ -48,6 +46,23 @@ export const createCommonDtosFile = () => {
   // Check if the common DTO file already exists
   if (!fs.existsSync(commonDto)) {
     fs.writeFileSync(commonDto, commonDtosFile())
+
+    console.log('Common DTO file has been copied.')
+  } else {
+    console.log('Common DTO file already exists.')
+  }
+}
+
+export const createCommonDtosFileRest = () => {
+  const commonDtoFolder = 'src/common/dtos'
+  createFolderIfNotPresent(commonDtoFolder)
+
+  const commonDtoPath = commonDtoFolder + '/common.dto.ts'
+  const commonDto = path.join(process.cwd(), commonDtoPath)
+
+  // Check if the common DTO file already exists
+  if (!fs.existsSync(commonDto)) {
+    fs.writeFileSync(commonDto, commonDtosFileRest())
 
     console.log('Common DTO file has been copied.')
   } else {

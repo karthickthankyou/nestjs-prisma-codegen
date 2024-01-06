@@ -1,6 +1,10 @@
 import { join } from 'path'
 const fs = require('fs')
-import { createCommonDtosFile, createComponentNames } from '../util'
+import {
+  createCommonDtosFile,
+  createComponentNames,
+  createFolderIfNotPresent,
+} from '../util'
 import {
   createEntityFile,
   createInputDtoFile,
@@ -31,7 +35,8 @@ export const createGraphqlFiles = () => {
 
   const names = createComponentNames(componentName)
 
-  // process.exit(0);
+  const modelsFolder = 'src/models'
+  createFolderIfNotPresent(modelsFolder)
 
   const { kebabPlural, kebab } = names
   const targetDir = join(process.cwd(), 'src/models', kebabPlural)

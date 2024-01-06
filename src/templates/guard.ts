@@ -1,34 +1,24 @@
 import { join } from 'path'
 
 export const authDecorator = `import {
+  SetMetadata,
+  UseGuards,
   applyDecorators,
   createParamDecorator,
   ExecutionContext,
-  SetMetadata,
-  UseGuards,
 } from '@nestjs/common'
-import { GqlExecutionContext } from '@nestjs/graphql'
-
-import { AuthGuard } from 'src/common/guards/auth.guard'
 import { Role } from 'src/common/types'
+
+import { AuthGuard } from './auth.guard'
+import { GqlExecutionContext } from '@nestjs/graphql'
 
 export const AllowAuthenticated = (...roles: Role[]) =>
   applyDecorators(SetMetadata('roles', roles), UseGuards(AuthGuard))
 
-export const AllowAuthenticatedOptional = (...roles: Role[]) =>
-  applyDecorators(
-    SetMetadata('allowUnauthenticated', true),
-    SetMetadata('roles', roles),
-    UseGuards(AuthGuard),
-  )
-
-export const GetUser = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const context = GqlExecutionContext.create(ctx)
-    const user = context.getContext().req.user
-    return user
-  },
-)
+export const GetUser = createParamDecorator((data, ctx: ExecutionContext) => {
+  const context = GqlExecutionContext.create(ctx)
+  return context.getContext().req.user
+})
 `
 
 export const authGuard = `import {
@@ -37,82 +27,92 @@ export const authGuard = `import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
-import { Reflector } from '@nestjs/core'
 import { GqlExecutionContext } from '@nestjs/graphql'
-import { FirebaseService } from 'src/common/firebase/firebase.service'
+import { JwtService } from '@nestjs/jwt'
+import { Reflector } from '@nestjs/core'
 import { Role } from 'src/common/types'
-
-const authorizeUsingAccesstoken = async (
-  accessToken: string,
-  firebaseService: FirebaseService,
-) => {
-  if (!accessToken) {
-    return null
-  }
-
-  try {
-    const data = await firebaseService.getAuth().verifyIdToken(accessToken)
-
-    const userData = await firebaseService
-      .getAuth()
-      .getUser(data.uid)
-      .then((userRecord) => userRecord)
-
-    const { uid, displayName } = userData
-    console.log('uid , displayname ', uid, displayName)
-    return { uid, displayName, roles: data.roles }
-  } catch (error) {
-    console.error('AuthMiddleware error: ', error)
-
-    return null
-  }
-}
+import { PrismaService } from 'src/common/prisma/prisma.service'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
+    private readonly jwtService: JwtService,
     private readonly reflector: Reflector,
-    private readonly firebaseService: FirebaseService,
+    private readonly prisma: PrismaService,
   ) {}
-
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const ctx = GqlExecutionContext.create(context)
     const req = ctx.getContext().req
 
+    await this.authenticateUser(req)
+
+    return this.authorizeUser(req, context)
+  }
+
+  private async authenticateUser(req: any): Promise<void> {
     const bearerHeader = req.headers.authorization
-    const accessToken = bearerHeader && bearerHeader.split(' ')[1]
+    // Bearer eylskfdjlsdf309
+    const token = bearerHeader?.split(' ')[1]
 
-    const user = await authorizeUsingAccesstoken(
-      accessToken,
-      this.firebaseService,
-    )
-
-    const allowUnauthenticated = this.reflector.getAllAndOverride<boolean>(
-      'allowUnauthenticated',
-      [context.getHandler(), context.getClass()],
-    )
-
-    if (!user && !allowUnauthenticated) {
-      throw new UnauthorizedException()
+    if (!token) {
+      throw new UnauthorizedException('No token provided.')
     }
-    req.user = user
 
-    const requiredRoles = this.reflector.getAllAndOverride<Role[]>('roles', [
-      context.getHandler(),
-      context.getClass(),
-    ])
+    try {
+      const user = await this.jwtService.verify(token)
+      req.user = user
+    } catch (err) {
+      console.error('Token validation error:', err)
+    }
 
-    if (requiredRoles.length === 0) {
+    if (!req.user) {
+      throw new UnauthorizedException('Invalid token.')
+    }
+  }
+
+  private async authorizeUser(
+    req: any,
+    context: ExecutionContext,
+  ): Promise<boolean> {
+    const requiredRoles = this.getMetadata<Role[]>('roles', context)
+    const userRoles = await this.getUserRoles(req.user.uid)
+
+    req.user.roles = userRoles
+
+    if (!requiredRoles || requiredRoles.length === 0) {
       return true
     }
 
-    return requiredRoles.some((role) => req.user?.roles?.includes(role))
+    return userRoles.some((userRole) =>
+      requiredRoles.every((requiredRole) => requiredRole === userRole),
+    )
+  }
+
+  private getMetadata<T>(key: string, context: ExecutionContext): T {
+    return this.reflector.getAllAndOverride<T>(key, [
+      context.getHandler(),
+      context.getClass(),
+    ])
+  }
+
+  private async getUserRoles(uid: string): Promise<Role[]> {
+    const rolePromises = [
+      this.prisma.admin.findUnique({ where: { uid } }),
+      // Add promises for other role models here
+    ]
+
+    const roles: Role[] = []
+
+    const [admin] = await Promise.all(rolePromises)
+    admin && roles.push('admin')
+
+    return roles
   }
 }
 `
 
-export const checkRowLevelPermission = `import { ForbiddenException } from '@nestjs/common'
-import { GetUserType, Role } from '../../common/types'
+export const checkRowLevelPermission = `import { GetUserType, Role } from 'src/common/types'
+import { ForbiddenException } from '@nestjs/common'
 
 export const checkRowLevelPermission = (
   user: GetUserType,

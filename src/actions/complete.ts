@@ -1,6 +1,11 @@
 import { join } from 'path'
 const fs = require('fs')
-import { createCommonDtosFile, createComponentNames } from '../util'
+import {
+  createCommonDtosFile,
+  createCommonDtosFileRest,
+  createComponentNames,
+  createFolderIfNotPresent,
+} from '../util'
 import {
   createEntityFile,
   createInputDtoFile,
@@ -18,6 +23,7 @@ import {
   createControllerFileRest,
   updateInputDtoFileRest,
   queryDtoFileRest,
+  commonDtosFileRest,
 } from '../templates/rest'
 import { createCompleteModuleFile } from '../templates/complete'
 
@@ -26,6 +32,7 @@ export const createCompleteFiles = () => {
   console.log('Generating files...', componentName)
 
   createCommonDtosFile()
+  createCommonDtosFileRest()
 
   if (!componentName) {
     console.error(`
@@ -39,7 +46,8 @@ export const createCompleteFiles = () => {
 
   const names = createComponentNames(componentName)
 
-  // process.exit(0);
+  const modelsFolder = 'src/models'
+  createFolderIfNotPresent(modelsFolder)
 
   const { kebabPlural, kebab } = names
   const targetDir = join(process.cwd(), 'src/models', kebabPlural)

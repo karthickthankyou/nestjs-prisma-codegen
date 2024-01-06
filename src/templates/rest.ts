@@ -22,21 +22,23 @@ export const createControllerFileRest = (names: Names) => {
     names
   const fileContent = `import {
   Controller, Get, Post, Body, Patch, Param, Delete, Query
-} from '@nestjs/common';
+} from '@nestjs/common'
 
-import { PrismaService } from 'src/common/prisma/prisma.service';
-import { ApiTags } from '@nestjs/swagger';
-import { Create${capital} } from './dtos/create.dto';
-import { ${capital}QueryDto } from './dtos/query.dto';
-import { Update${capital} } from './dtos/update.dto';
+import { PrismaService } from 'src/common/prisma/prisma.service'
+import { ApiTags } from '@nestjs/swagger'
+import { Create${capital} } from './dtos/create.dto'
+import { ${capital}QueryDto } from './dtos/query.dto'
+import { Update${capital} } from './dtos/update.dto'
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
-} from '@nestjs/swagger';
-import { ${capital}Entity } from './entity/${camel}.entity';
-import { AllowAuthenticated, GetUser } from 'src/common/auth/auth.decorator';
-import { GetUserType } from 'src/common/util/types';
+} from '@nestjs/swagger'
+import { ${capital}Entity } from './entity/${camel}.entity'
+import { AllowAuthenticated, GetUser } from 'src/common/auth/auth.decorator'
+import { GetUserType } from 'src/common/types'
+import { checkRowLevelPermission } from 'src/common/auth/util'
+
 
 @ApiTags('${kebabPlural}')
 @Controller('${kebabPlural}')
@@ -47,8 +49,9 @@ export class ${capitalPlural}Controller {
   @ApiBearerAuth()
   @ApiCreatedResponse({ type: ${capital}Entity })
   @Post()
-  create(@Body() create${capital}Dto: Create${capital}) {
-    return this.prisma.${camel}.create({ data: create${capital}Dto });
+  create(@Body() create${capital}Dto: Create${capital}, @GetUser() user: GetUserType) {
+    checkRowLevelPermission(user, create${capital}Dto.uid)
+    return this.prisma.${camel}.create({ data: create${capital}Dto })
   }
 
   @ApiOkResponse({ type: [${capital}Entity] })
@@ -58,35 +61,39 @@ export class ${capitalPlural}Controller {
       ...(skip ? { skip: +skip } : null),
       ...(take ? { take: +take } : null),
       ...(sortBy ? { orderBy: { [sortBy]: order || 'asc' } } : null),
-    });
+    })
   }
 
   @ApiOkResponse({ type: ${capital}Entity })
   @Get(':id')
   findOne(@Param('id') id: number) {
-    return this.prisma.${camel}.findUnique({ where: { id } });
+    return this.prisma.${camel}.findUnique({ where: { id } })
   }
 
   @ApiOkResponse({ type: ${capital}Entity })
   @ApiBearerAuth()
   @AllowAuthenticated()
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: number,
     @Body() update${capital}Dto: Update${capital},
     @GetUser() user: GetUserType,
   ) {
+    const ${camel} = await this.prisma.${camel}.findUnique({ where: { id } })
+    checkRowLevelPermission(user, ${camel}.uid)
     return this.prisma.${camel}.update({
       where: { id },
       data: update${capital}Dto,
-    });
+    })
   }
 
   @ApiBearerAuth()
   @AllowAuthenticated()
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.prisma.${camel}.delete({ where: { id } });
+  async remove(@Param('id') id: number, @GetUser() user: GetUserType) {
+    const ${camel} = await this.prisma.${camel}.findUnique({ where: { id } })
+    checkRowLevelPermission(user, ${camel}.uid)
+    return this.prisma.${camel}.delete({ where: { id } })
   }
 }
 `

@@ -16,12 +16,13 @@
   },
   "scripts": {
     "prettier": "prettier \"src/**/*.{ts,tsx,js,json}\" --ignore-path .gitignore",
-    "format:check": "yarn prettier --check",
-    "format:write": "yarn prettier --write",
+    "format:check": "pnpm prettier --check",
+    "format:write": "pnpm prettier --write",
     "release": "release-it",
     "build": "tsc",
     "prepare": "husky install",
-    "lint-staged": "lint-staged"
+    "lint-staged": "lint-staged",
+    "local-link": "pnpm build && npm link"
   },
   "dependencies": {
     "change-case": "^4.1.2",

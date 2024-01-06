@@ -1,39 +1,28 @@
 #!/usr/bin/env ts-node
 
 import { createAuthRoutes } from './actions/authRoutes'
+import { createCommonFile } from './actions/common'
 import { createCompleteFiles } from './actions/complete'
 import { createGraphqlFiles } from './actions/graphql'
-import {
-  createDecoratorFiles,
-  createGuardFiles,
-  createTypes,
-} from './actions/guard'
+import { createAuthFiles } from './actions/guard'
 import { createPrismaModule } from './actions/prisma'
 import { createRestFiles } from './actions/rest'
+import { commonDtosFileRest } from './templates/rest'
 
 const [action] = process.argv.slice(2, 3)
 
 switch (action) {
   case '--graphql':
-    createPrismaModule()
+    createCommonFile()
     createGraphqlFiles()
     break
   case '--rest':
-    createPrismaModule()
+    createCommonFile()
     createRestFiles()
     break
   case '--complete':
-    createPrismaModule()
+    createCommonFile()
     createCompleteFiles()
-    break
-  case '--guard':
-    createTypes()
-    createGuardFiles()
-    createDecoratorFiles()
-    break
-  case '--auth-routes':
-    createTypes()
-    createAuthRoutes()
     break
 
   default:

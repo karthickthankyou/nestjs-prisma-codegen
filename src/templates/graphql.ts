@@ -28,13 +28,20 @@ import { ${capital} } from './entity/${kebab}.entity'
 import { FindMany${capital}Args, FindUnique${capital}Args } from './dtos/find.args'
 import { Create${capital}Input } from './dtos/create-${kebab}.input'
 import { Update${capital}Input } from './dtos/update-${kebab}.input'
+import { checkRowLevelPermission } from 'src/common/auth/util'
+import { GetUserType } from 'src/common/types'
+import { AllowAuthenticated, GetUser } from 'src/common/auth/auth.decorator'
+import { PrismaService } from 'src/common/prisma/prisma.service'
 
 @Resolver(() => ${capital})
 export class ${capitalPlural}Resolver {
-  constructor(private readonly ${camelPlural}Service: ${capitalPlural}Service) {}
+  constructor(private readonly ${camelPlural}Service: ${capitalPlural}Service,
+    private readonly prisma: PrismaService) {}
 
+  @AllowAuthenticated()
   @Mutation(() => ${capital})
-  create${capital}(@Args('create${capital}Input') args: Create${capital}Input) {
+  create${capital}(@Args('create${capital}Input') args: Create${capital}Input, @GetUser() user: GetUserType) {
+    checkRowLevelPermission(user, args.uid)
     return this.${camelPlural}Service.create(args)
   }
 
@@ -48,13 +55,19 @@ export class ${capitalPlural}Resolver {
     return this.${camelPlural}Service.findOne(args)
   }
 
+  @AllowAuthenticated()
   @Mutation(() => ${capital})
-  update${capital}(@Args('update${capital}Input') args: Update${capital}Input) {
+  async update${capital}(@Args('update${capital}Input') args: Update${capital}Input, @GetUser() user: GetUserType) {
+    const ${camel} = await this.prisma.${camel}.findUnique({ where: { id: args.id } })
+    checkRowLevelPermission(user, ${camel}.uid)
     return this.${camelPlural}Service.update(args)
   }
 
+  @AllowAuthenticated()
   @Mutation(() => ${capital})
-  remove${capital}(@Args() args: FindUnique${capital}Args) {
+  async remove${capital}(@Args() args: FindUnique${capital}Args, @GetUser() user: GetUserType) {
+    const ${camel} = await this.prisma.${camel}.findUnique(args)
+    checkRowLevelPermission(user, ${camel}.uid)
     return this.${camelPlural}Service.remove(args)
   }
 }
@@ -288,7 +301,7 @@ registerEnumType(Prisma.QueryMode, {
 // implements Required<Prisma.StringFilter>
 @InputType()
 export class StringFilter {
-  equals?: string;
+  equals?: string
   in?: string[]
   notIn?: string[]
   lt?: string

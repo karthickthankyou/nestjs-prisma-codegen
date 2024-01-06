@@ -4,7 +4,7 @@ import {
   authResolver,
   authService,
 } from '../templates/authRoutes'
-import { firebaseModule, firebaseService } from '../templates/firebase'
+
 import { createFolderIfNotPresent, fsWriteFile } from '../util'
 
 export const createAuthRoutes = () => {
@@ -23,6 +23,4 @@ export const createAuthRoutes = () => {
   fsWriteFile(`${routesDtoPath}/auth.input.ts`, authInputDto)
 
   createFolderIfNotPresent(firebaseModulePath)
-  fsWriteFile(`${firebaseModulePath}/firebase.module.ts`, firebaseModule)
-  fsWriteFile(`${firebaseModulePath}/firebase.service.ts`, firebaseService)
 }
