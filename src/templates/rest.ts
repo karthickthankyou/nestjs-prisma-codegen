@@ -143,6 +143,10 @@ export class ${capital}QueryDto extends BaseQueryDto {
   @IsOptional()
   @IsIn(Object.values(Prisma.${capital}ScalarFieldEnum))
   sortBy?: string
+
+  @IsOptional()
+  @IsIn(Object.values(Prisma.${capital}ScalarFieldEnum))
+  searchBy?: string
 }
 
 `
@@ -163,7 +167,7 @@ export class ${capital}Entity implements RestrictProperties<${capital}Entity, ${
 }
 
 export const commonDtosFileRest =
-  () => `import { IsIn, IsNumberString, IsOptional } from 'class-validator'
+  () => `import { IsIn, IsNumberString, IsOptional, IsString } from 'class-validator'
 
 export class BaseQueryDto {
   @IsNumberString()
@@ -174,9 +178,11 @@ export class BaseQueryDto {
   @IsOptional()
   take?: number
 
+  @IsString()
+  @IsOptional()
+  search?: string
+
   @IsOptional()
   @IsIn(['asc', 'desc'])
   order?: 'asc' | 'desc'
-}
-
-`
+}`
